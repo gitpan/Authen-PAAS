@@ -1,0 +1,9 @@
+ Authen::PAAS - Perl Authentication & Authorization Service
+ ==========================================================
+
+This package provides a pluggable Perl authentication and
+authorization service. This module is inspired by PAM and
+the Java JAAS services. Consult Authen::PAAS manual page
+for further information
+
+-- End

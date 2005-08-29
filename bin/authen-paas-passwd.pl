@@ -1,0 +1,148 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Config::Record 1.1.0;
+
+my $create = 0;
+my $md5 = 0;
+my $sha1 = 0;
+my $help = 0;
+my $debug = 0;
+
+
+if (!GetOptions("create+" => \$create,
+		"sha1+" => \$sha1,
+		"md5+" => \$md5,
+		"debug+" => \$debug,
+		"help+" => \$help) ||
+    $help ||
+    $#ARGV != 1) {
+    &show_help($help ? \*STDOUT : \*STDERR);
+    exit $help ? 0 : 1;
+}
+
+$SIG{__DIE__} = sub {
+    system "stty echo";
+    die $_[0];
+};
+
+my $configfile = shift @ARGV;
+my $username = shift @ARGV;
+
+unless (-f $configfile || $create) {
+    print STDERR "Password file does not exist\n";
+    exit 1;
+}
+
+
+my $password;
+for (;;) {
+    print "Enter new passwd:\n";
+    system "stty -echo";
+    my $passwd = <STDIN>;
+    chomp $passwd;
+    
+    print "Repeat new passwd:\n";
+    my $verify = <STDIN>;
+    chomp $verify;
+    
+    if ($verify ne $passwd) {
+	print "Passwords do not match, try again\n";
+    } else {
+	$password = $passwd;
+	last;
+    }
+}
+
+system "stty echo";
+
+my $config = -f $configfile ? Config::Record->new(file => $configfile) : Config::Record->new();
+
+my @keys = ('a'..'z','A'..'Z','0'..'9');
+my $salt = join('', map { $keys[$_] } (rand(int(@keys)),rand(int(@keys)),
+				       rand(int(@keys)),rand(int(@keys)),
+				       rand(int(@keys)),rand(int(@keys)),
+				       rand(int(@keys)),rand(int(@keys))));
+
+if ($md5) {
+    $salt = '$1$' . $salt;
+} elsif ($sha1) {
+    $salt = '$2$' . $salt;
+}
+
+print "Using salt '$salt'\n" if $debug;
+
+my $crypted = crypt($password, $salt);
+
+$config->set("$username", $config->get("$username", {}));
+$config->set("$username/password", $crypted);
+$config->save($configfile);
+
+exit 0;
+
+sub show_help {
+    my $out = shift;
+    print $out <<EOF;
+    
+ syntax: $0 [OPTIONS] PASSWD-FILE USERNAME
+
+Options:
+
+   --create   create password file if not existing
+   --md5      force use of md5 passwords
+   --sha1     force use of sha1 passwords
+   --help     show this help messages
+
+EOF
+}
+
+=pod
+
+=head1 NAME
+
+ authen-paas-passwd.pl   Create/update password file entries
+
+=head1 SYNOPSIS
+ 
+  authen-paas-passwd.pl [OPTIONS] PASSWD-FILE USERNAME
+
+  Options:
+
+     --create   create password file if not existing
+     --md5      force use of md5 passwords
+     --sha1     force use of sha1 passwords
+     --help     show this help messages
+
+=head1 DESCRIPTION
+
+Similar to traditional Apache L<htpasswd(1)> command, this provides
+a tool for creating / updating user's password entries in the 
+configuration file format used by L<Authen::PAAS::BasicLoginModule>
+
+=head1 EXAMPLES
+
+  # Update joeblogs
+  $ authen-paas-passwd.pl /etc/authen-paas-passwd.cfg joeblogs
+
+  # Update joeblogs, creating the password file if
+  # it does not already exist
+  $ authen-paas-passwd.pl --create /etc/authen-paas-passwd.cfg joeblogs
+
+  # Update joe blogs, using md5 crypt
+  $ authen-paas-passwd.pl --md5 /etc/authen-paas-passwd.cfg joeblogs
+
+=head1 COPYRIGHT
+
+Daniel P. Berrange L<dan@berrange.com>
+
+=head1 BUGS
+
+Probably - please report them!
+
+=head1 SEE ALSO
+
+L<htpasswd(1)>, L<Authen::PAAS>
+
+=cut
