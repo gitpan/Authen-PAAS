@@ -1,0 +1,11 @@
+   Changelog for Authen::PAAS
+   ==========================
+
+New in version 1.1.1:
+
+ * Make sure all modules use 'warnings' and 'strict' pragmas
+ * Replace use of 'confess' with plain 'die', since most calling
+   programs will simply register a '$SIG{DIE}' hook to turn all
+   'die' calls into 'confess' automatically.
+ * Massive documentation improvements, 100% API coverage and 
+   fixing of numerous errors

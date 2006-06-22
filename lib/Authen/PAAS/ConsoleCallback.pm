@@ -2,7 +2,7 @@
 #
 # Authen::PAAS::ConsoleCallback by Daniel Berrange
 #
-# Copyright (C) 2004-2005 Dan Berrange
+# Copyright (C) 2004-2006 Dan Berrange
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,17 +47,17 @@ and reads a response from STDIN.
 package Authen::PAAS::ConsoleCallback;
 
 use base qw(Authen::PAAS::Callback);
+
 use strict;
-use Carp qw(confess);
+use warnings;
+
 use IO::Handle;
 
 our $VERSION = '1.0.0';
 
-=pod
-
 =item my $callback = Authen::PAAS::ConsoleCallback->new($label);
 
-Create a new console callback, using the C<$label> parameter 
+Create a new console callback, using the C<$label> parameter
 as the prompt to display on STDOUT.
 
 =cut
@@ -74,7 +74,6 @@ sub new {
     return $self;
 }
 
-=pod
 
 =item my $data = $callback->data;
 
@@ -87,7 +86,7 @@ is returned
 
 sub data {
     my $self = shift;
-    
+
     print $self->{label};
     flush STDOUT;
 
@@ -101,7 +100,7 @@ sub data {
 
 __END__
 
-=back 4
+=back
 
 =head1 AUTHORS
 
@@ -109,10 +108,10 @@ Daniel Berrange <dan@berrange.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2005 Daniel Berrange
+Copyright (C) 2004-2006 Daniel Berrange
 
 =head1 SEE ALSO
 
-L<perl(1)>
+L<Authen::PAAS::Callback>
 
 =cut

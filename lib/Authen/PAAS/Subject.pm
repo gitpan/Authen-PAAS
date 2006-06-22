@@ -2,7 +2,7 @@
 #
 # Authen::PAAS::Subject by Daniel Berrange
 #
-# Copyright (C) 2004-2005 Dan Berrange
+# Copyright (C) 2004-2006 Dan Berrange
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,12 +35,12 @@ Authen::PAAS::Subject - represents an authenticated party
   # Create a new anonymous subject with no credentials
   my $subject = Authen::PAAS::Subject->new();
 
-  # Add a principal eg a UNIX username, or a Kerberos 
+  # Add a principal eg a UNIX username, or a Kerberos
   # principal, or some such
   my $prin = SomePrincipal->new();
   $subject->add_principal($prin)
 
-  # Add a credential. eg some form of magic token 
+  # Add a credential. eg some form of magic token
   # representing a previously added principal
   my $cred = SomeCredential->new($principal)
   $subject->add_credential($cred);
@@ -76,16 +76,16 @@ The C<Authen::PAAS::Subject> module provides a representation
 of an authenticated party, be they a human user, or a independantly
 operating computing service. An authenticated subject will have
 one of more principals associated with them, which can be thought
-of as their set of C<names>. These are represented by the 
-L<Authen::PAAS::Principal> module. Some authentication mechanisms 
-will also associate some form of security related token with a 
-subject, thus an authenticated subject may also have zero or more 
+of as their set of C<names>. These are represented by the
+L<Authen::PAAS::Principal> module. Some authentication mechanisms
+will also associate some form of security related token with a
+subject, thus an authenticated subject may also have zero or more
 credentials. These are represented by the L<Authen::PAAS::Credential>
-module. 
+module.
 
 An authenticated subject is typically obtained via the C<login>
 method on the L<Authen::PAAS::Context> module. This creates an
-anonymous subject, and invokes a set of login modules 
+anonymous subject, and invokes a set of login modules
 (L<Authen::PAAS::LoginModule>), which in turn populate the
 subject with principals and credentials.
 
@@ -97,12 +97,12 @@ subject with principals and credentials.
 
 package Authen::PAAS::Subject;
 
+
 use strict;
-use Carp qw(confess);
+use warnings;
 
 our $VERSION = '1.0.0';
 
-=pod
 
 =item my $subject = Authen::PAAS::Subject->new();
 
@@ -125,14 +125,13 @@ sub new {
     return $self;
 }
 
-=pod
 
-=item $subject->add_pricipal($owner, $principal)
+=item $subject->add_principal($owner, $principal)
 
 Adds a principal to the subject. The C<$owner> parameter
 should be the class name of the login module owning the
-principal. The principal parameter must be a subclass of 
-the L<Authen::PAAS::Principal> class. 
+principal. The principal parameter must be a subclass of
+the L<Authen::PAAS::Principal> class.
 
 =cut
 
@@ -146,7 +145,6 @@ sub add_principal {
     $self->{principals}->{$owner}->{$type} = $principal;
 }
 
-=pod
 
 =item $subject->remove_principal($owner[, $type]);
 
@@ -160,7 +158,7 @@ sub remove_principal {
     my $self = shift;
     my $owner = shift;
     my $type = shift;
-    
+
     return  unless exists $self->{principals}->{$owner};
     if ($type) {
 	delete $self->{principals}->{$owner}->{$type};
@@ -169,9 +167,8 @@ sub remove_principal {
     }
 }
 
-=pod
 
-=item $subject->principals_by_owner($owner);
+=item my @principals = $subject->principals_by_owner($owner);
 
 Retrieves a list of all the principals for the subject associated
 with the owner specified in the C<$owner> parameter. The
@@ -182,18 +179,16 @@ module
 
 sub principals_by_owner {
     my $self = shift;
-    
+
     my $owner = shift;
     return () unless exists $self->{principals}->{$owner};
     return values %{$self->{principals}->{$owner}};
 }
 
-=pod
-
-=item $subject->principal($type);
+=item my @principals = $subject->principals_by_type($type);
 
 Retrieves the first matching principal of a given type. The
-C<$type> parameter should be the Perl module name of the 
+C<$type> parameter should be the Perl module name of the
 principal implementation.
 
 =cut
@@ -201,11 +196,9 @@ principal implementation.
 sub principals_by_type {
     my $self = shift;
     my $type = shift;
-    
+
     return grep { $_->isa($type) } $self->principals;
 }
-
-=pod
 
 =item my @principals = $subject->principals;
 
@@ -215,7 +208,7 @@ Retrieves a list of all the principals for the subject.
 
 sub principals {
     my $self = shift;
-    
+
     my @principals;
     foreach my $owner (keys %{$self->{principals}}) {
 	push @principals, values %{$self->{principals}->{$owner}};
@@ -224,14 +217,12 @@ sub principals {
 }
 
 
-=pod
-
 =item $subject->add_credential($owner, $credential)
 
 Adds a credential to the subject. The C<$owner> parameter
 should be the class name of the login module owning the
-credential. The credential parameter must be a subclass of 
-the L<Authen::PAAS::Credential> class. 
+credential. The credential parameter must be a subclass of
+the L<Authen::PAAS::Credential> class.
 
 =cut
 
@@ -245,8 +236,6 @@ sub add_credential {
     $self->{credentials}->{$owner}->{$type} = $credential;
 }
 
-=pod
-
 =item $subject->remove_credential($owner[, $type]);
 
 Removes a previously added credential from the subject. The
@@ -259,7 +248,7 @@ sub remove_credential {
     my $self = shift;
     my $owner = shift;
     my $type = shift;
-    
+
     return  unless exists $self->{credentials}->{$owner};
     if ($type) {
 	delete $self->{credentials}->{$owner}->{$type};
@@ -268,9 +257,7 @@ sub remove_credential {
     }
 }
 
-=pod
-
-=item $subject->credentials_by_owner($owner);
+=item my @credentials = $subject->credentials_by_owner($owner);
 
 Retrieves a list of all the credentials for the subject associated
 with the owner specified in the C<$owner> parameter. The
@@ -281,18 +268,16 @@ module
 
 sub credentials_by_owner {
     my $self = shift;
-    
+
     my $owner = shift;
     return () unless exists $self->{credentials}->{$owner};
     return values %{$self->{credentials}->{$owner}};
 }
 
-=pod
-
-=item $subject->credential($type);
+=item my @credentials = $subject->credentials_by_type($type);
 
 Retrieves the first matching credential of a given type. The
-C<$type> parameter should be the Perl module name of the 
+C<$type> parameter should be the Perl module name of the
 credential implementation.
 
 =cut
@@ -300,11 +285,9 @@ credential implementation.
 sub credentials_by_type {
     my $self = shift;
     my $type = shift;
-    
+
     return grep { $_->isa($type) } $self->credentials;
 }
-
-=pod
 
 =item my @credentials = $subject->credentials;
 
@@ -314,7 +297,7 @@ Retrieves a list of all the credentials for the subject.
 
 sub credentials {
     my $self = shift;
-    
+
     my @credentials;
     foreach my $owner (keys %{$self->{credentials}}) {
 	push @credentials, values %{$self->{credentials}->{$owner}};
@@ -326,7 +309,7 @@ sub credentials {
 
 __END__
 
-=back 4
+=back
 
 =head1 AUTHORS
 
@@ -334,11 +317,11 @@ Daniel Berrange <dan@berrange.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2005 Daniel Berrange
+Copyright (C) 2004-2006 Daniel Berrange
 
 =head1 SEE ALSO
 
-L<perl(1)>, L<Authen::PAAS::Context>, L<Authen::PAAS::Credential>,
+L<Authen::PAAS::Context>, L<Authen::PAAS::Credential>,
 L<Authen::PAAS::Principal>
 
 =cut

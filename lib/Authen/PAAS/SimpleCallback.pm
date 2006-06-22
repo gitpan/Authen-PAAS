@@ -2,7 +2,7 @@
 #
 # Authen::PAAS::SimpleCallback by Daniel Berrange
 #
-# Copyright (C) 2004 Dan Berrange
+# Copyright (C) 2004-2006 Dan Berrange
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,15 +24,20 @@
 
 =head1 NAME
 
-Authen::PAAS::SimpleCallback - blah
+Authen::PAAS::SimpleCallback - A callback implementation with static data
 
 =head1 SYNOPSIS
 
   use Authen::PAAS::SimpleCallback;
 
+  my $cb = Authen::PAAS::SimpleCallback->new(data => "joe");
+
+  print $cb->data, "\n";
+
 =head1 DESCRIPTION
 
-Blah
+This module provides a trivial subclass of the L<Authen::PAAS::Callback>
+which always returns a pre-defined chunk of static data.
 
 =head1 METHODS
 
@@ -43,16 +48,19 @@ Blah
 package Authen::PAAS::SimpleCallback;
 
 use base qw(Authen::PAAS::Callback);
+
 use strict;
-use Carp qw(confess);
+use warnings;
 
 our $VERSION = '1.0.0';
 
-=pod
 
-=item $obj = Authen::PAAS::SimpleCallback->new();
+=item $cb = Authen::PAAS::SimpleCallback->new(data => $data);
 
-Create
+Create a new callback object which will later provide the piece
+of static data defined by the C<data> parameter. The data can be
+of an arbitrary Perl data type, it is treated opaquely by this
+module.
 
 =cut
 
@@ -68,6 +76,14 @@ sub new {
     return $self;
 }
 
+=item $cb->data;
+
+Retrieve the data associated with this callback object. The
+returned data will be that which was orginally passed into
+the constructor.
+
+=cut
+
 sub data {
     my $self = shift;
     return $self->{data};
@@ -77,7 +93,7 @@ sub data {
 
 __END__
 
-=back 4
+=back
 
 =head1 AUTHORS
 
@@ -85,10 +101,10 @@ Daniel Berrange <dan@berrange.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004 Daniel Berrange
+Copyright (C) 2004-2006 Daniel Berrange
 
 =head1 SEE ALSO
 
-L<perl(1)>
+L<Authen::PAAS::Context>, L<Authen::PAAS::Callback>
 
 =cut

@@ -2,7 +2,7 @@
 #
 # Authen::PAAS::LoginModule by Daniel Berrange
 #
-# Copyright (C) 2004-2005 Dan Berrange
+# Copyright (C) 2004-2006 Dan Berrange
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,13 +36,13 @@ Authen::PAAS::LoginModule - a pluggable authentication module
 
 This module provides the API for authenticating a subject
 for the purposes of session login. It will be subclassed
-to provide the implementations of different authentication 
+to provide the implementations of different authentication
 schemes.
 
 =head1 CONFIGURATION
 
 This module expects one custom configuration option with
-the key C<passwd> to refer to the username, password 
+the key C<passwd> to refer to the username, password
 mapping file.
 
 =head1 METHODS
@@ -61,8 +61,6 @@ use base qw(Authen::PAAS::LoginModule);
 
 our $VERSION = '1.0.0';
 
-=pod
-
 =item my $res = $module->login($subject, $callbacks);
 
 Attempt to authenticate the subject against the simple username
@@ -75,36 +73,34 @@ sub login {
     my $self = shift;
     my $subject = shift;
     my $callbacks = shift;
-    
+
     return 0 unless exists $callbacks->{username};
     return 0 unless exists $callbacks->{password};
-    
+
     my $username = $callbacks->{username}->data;
     my $password = $callbacks->{password}->data;
-    
+
     my $expected = $self->_load_password($username);
     return 0 unless defined $expected;
-    
+
     my $actual = crypt($password, $expected);
-    
+
     return 0 unless $expected eq $actual;
-    
+
     $subject->add_principal(ref($self), Authen::PAAS::BasicUser->new($username));
-    
+
     return 1;
 }
 
 sub _load_password {
     my $self = shift;
     my $username = shift;
-    
+
     my $config = Config::Record->new(file => $
-				     self->option("passwd-file", 
+				     self->option("passwd-file",
 						  "/etc/authen-paas-basic.cfg"));
     return $config->get("$username/password", undef);
 }
-
-=pod
 
 =item $module->logout($subject);
 
@@ -126,7 +122,7 @@ sub logout {
 
 __END__
 
-=back 4
+=back
 
 =head1 AUTHORS
 
@@ -134,11 +130,11 @@ Daniel Berrange <dan@berrange.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2005 Daniel Berrange
+Copyright (C) 2004-2006 Daniel Berrange
 
 =head1 SEE ALSO
 
-L<perl(1)>, L<Authen::PAAS::Context>, L<Authen::PAAS::Subject>,
+L<Authen::PAAS::LoginModule>, L<Authen::PAAS::Context>, L<Authen::PAAS::Subject>,
 L<Authen::PAAS::Callback>.
 
 =cut

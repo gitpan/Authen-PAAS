@@ -2,7 +2,7 @@
 #
 # Authen::PAAS::LoginModule by Daniel Berrange
 #
-# Copyright (C) 2004-2005 Dan Berrange
+# Copyright (C) 2004-2006 Dan Berrange
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ Authen::PAAS::LoginModule - a pluggable authentication module
 
 This module provides the API for authenticating a subject
 for the purposes of session login. It will be subclassed
-to provide the implementations of different authentication 
+to provide the implementations of different authentication
 schemes.
 
 =head1 METHODS
@@ -49,11 +49,9 @@ package Authen::PAAS::LoginModule;
 
 use warnings;
 use strict;
-use Carp qw(confess);
 
 our $VERSION = '1.0.0';
 
-=pod
 
 =item my $module = Authen::PAAS::LoginModule->new(flags => $flags, options => \%options);
 
@@ -70,7 +68,7 @@ sub new {
     my $self = {};
     my %params = @_;
 
-    $self->{flags} = exists $params{flags} ? $params{flags} : confess "flags parameter is required";
+    $self->{flags} = exists $params{flags} ? $params{flags} : die "flags parameter is required";
     $self->{options} = exists $params{options} ? $params{options} : {};
 
     bless $self, $class;
@@ -78,7 +76,6 @@ sub new {
     return $self;
 }
 
-=pod
 
 =item $module->option($name, $default);
 
@@ -94,12 +91,11 @@ sub option {
     return exists $self->{options}->{$name} ? $self->{options}->{$name} : shift;
 }
 
-=pod
 
 =item my $flags = $module->flags;
 
-Retrieves the flags for the module, one of the keywords C<sufficient>, 
-C<requisite>, C<required> and C<optional>. 
+Retrieves the flags for the module, one of the keywords C<sufficient>,
+C<requisite>, C<required> and C<optional>.
 
 =cut
 
@@ -108,16 +104,15 @@ sub flags {
     return $self->{flags};
 }
 
-=pod
 
 =item my $res = $module->login($subject, $callbacks);
 
 Attempt to login using authentication data obtained
 from the callbacks, if successful, adding principals
-and credentials to the subject. The C<$callbacks> 
+and credentials to the subject. The C<$callbacks>
 parameter is a hash reference, whose keys are the
 names of authentication tokes, and values are instances
-of th L<Authen::PAAS::Callback> class. If successful, 
+of th L<Authen::PAAS::Callback> class. If successful,
 this method must return a true value, otherwise a false
 value. This method must be implemented by subclasses.
 
@@ -125,10 +120,9 @@ value. This method must be implemented by subclasses.
 
 sub login {
     my $self = shift;
-    confess "module " . ref($self) . " forgot to implement login";
+    die "module " . ref($self) . " forgot to implement login";
 }
 
-=pod
 
 =item $module->logout($subject);
 
@@ -141,7 +135,7 @@ This method must be implemented by subclasses.
 
 sub logout {
     my $self = shift;
-    confess "module " . ref($self) . " forgot to implement logout";
+    die "module " . ref($self) . " forgot to implement logout";
 }
 
 
@@ -149,7 +143,7 @@ sub logout {
 
 __END__
 
-=back 4
+=back
 
 =head1 AUTHORS
 
@@ -157,11 +151,11 @@ Daniel Berrange <dan@berrange.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2005 Daniel Berrange
+Copyright (C) 2004-2006 Daniel Berrange
 
 =head1 SEE ALSO
 
-L<perl(1)>, L<Authen::PAAS::Context>, L<Authen::PAAS::Subject>,
+L<Authen::PAAS::Context>, L<Authen::PAAS::Subject>,
 L<Authen::PAAS::Callback>.
 
 =cut

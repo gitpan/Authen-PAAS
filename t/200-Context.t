@@ -5,6 +5,9 @@ use strict;
 use warnings;
 use File::Spec::Functions;
 use Config::Record;
+use Log::Log4perl;
+
+Log::Log4perl::init("t/log4perl.conf");
 
 BEGIN {
 	use_ok("Authen::PAAS::Context");

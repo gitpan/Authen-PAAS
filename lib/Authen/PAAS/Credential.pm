@@ -2,7 +2,7 @@
 #
 # Authen::PAAS::Credential by Daniel Berrange
 #
-# Copyright (C) 2004 Dan Berrange
+# Copyright (C) 2004-2006 Dan Berrange
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,15 +24,23 @@
 
 =head1 NAME
 
-Authen::PAAS::Credential - blah
+Authen::PAAS::Credential - represents a credential for a subject
 
 =head1 SYNOPSIS
 
   use Authen::PAAS::Credential;
 
+  my $cred = Authen::PAAS::Credential->new(name => "krb5ticket");
+
+  print $cred->name, "\n";
+
 =head1 DESCRIPTION
 
-Blah
+The C<Authen::PAAS::Credential> module represents a credential for
+an authenticated subject. A credential is merely an abstract token
+generated during the authentication process. This module would be
+subclassed by C<Authen::PAAS::LoginModule> implementations to provide
+module specific data.
 
 =head1 METHODS
 
@@ -44,15 +52,15 @@ package Authen::PAAS::Credential;
 
 use warnings;
 use strict;
-use Carp qw(confess);
 
 our $VERSION = '1.0.0';
 
-=pod
 
-=item $obj = Authen::PAAS::Credential->new();
+=item $cred = Authen::PAAS::Credential->new(name => $name);
 
-Create
+Create a new credential assigning it the name given by the
+C<name> parameter to the method. This constructor is usually
+only used by sub-classes.
 
 =cut
 
@@ -62,13 +70,19 @@ sub new {
     my $self = {};
     my %params = @_;
 
-    $self->{name} = exists $params{name} ? $params{name} : confess "name parameter is required";
+    $self->{name} = exists $params{name} ? $params{name} : die "name parameter is required";
 
     bless $self, $class;
 
     return $self;
 }
 
+
+=item $name = $cred->name;
+
+Retrieves the name of this credential.
+
+=cut
 
 sub name {
     my $self = shift;
@@ -79,7 +93,7 @@ sub name {
 
 __END__
 
-=back 4
+=back
 
 =head1 AUTHORS
 
@@ -87,10 +101,10 @@ Daniel Berrange <dan@berrange.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004 Daniel Berrange
+Copyright (C) 2004-2006 Daniel Berrange
 
 =head1 SEE ALSO
 
-L<perl(1)>
+L<Authen::PAAS::Subject>, L<Authen::PAAS::Principal>
 
 =cut

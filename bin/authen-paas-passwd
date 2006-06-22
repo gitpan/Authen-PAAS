@@ -102,11 +102,11 @@ EOF
 
 =head1 NAME
 
- authen-paas-passwd.pl   Create/update password file entries
+ authen-paas-passwd   Create/update password file entries
 
 =head1 SYNOPSIS
  
-  authen-paas-passwd.pl [OPTIONS] PASSWD-FILE USERNAME
+  authen-paas-passwd [OPTIONS] PASSWD-FILE USERNAME
 
   Options:
 
@@ -121,17 +121,20 @@ Similar to traditional Apache L<htpasswd(1)> command, this provides
 a tool for creating / updating user's password entries in the 
 configuration file format used by L<Authen::PAAS::BasicLoginModule>
 
+NB, the SHA1 password hashing is only available on a few systems, notably
+B<not> most Linux systems.
+
 =head1 EXAMPLES
 
   # Update joeblogs
-  $ authen-paas-passwd.pl /etc/authen-paas-passwd.cfg joeblogs
+  $ authen-paas-passwd /etc/authen-paas-passwd.cfg joeblogs
 
   # Update joeblogs, creating the password file if
   # it does not already exist
-  $ authen-paas-passwd.pl --create /etc/authen-paas-passwd.cfg joeblogs
+  $ authen-paas-passwd --create /etc/authen-paas-passwd.cfg joeblogs
 
   # Update joe blogs, using md5 crypt
-  $ authen-paas-passwd.pl --md5 /etc/authen-paas-passwd.cfg joeblogs
+  $ authen-paas-passwd --md5 /etc/authen-paas-passwd.cfg joeblogs
 
 =head1 COPYRIGHT
 
@@ -143,6 +146,6 @@ Probably - please report them!
 
 =head1 SEE ALSO
 
-L<htpasswd(1)>, L<Authen::PAAS>
+C<passwd(1)>, C<htpasswd(1)>, L<Authen::PAAS>
 
 =cut

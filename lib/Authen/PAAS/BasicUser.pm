@@ -2,7 +2,7 @@
 #
 # Authen::PAAS::BasicUser by Daniel Berrange
 #
-# Copyright (C) 2004-2005 Dan Berrange
+# Copyright (C) 2004-2006 Dan Berrange
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,13 +45,12 @@ principal created by the L<Authen::PAAS::BasicLoginModule> module
 
 package Authen::PAAS::BasicUser;
 
-use warnings;
-use strict;
 use base qw(Authen::PAAS::Principal);
 
-our $VERSION = '1.0.0';
+use warnings;
+use strict;
 
-=pod
+our $VERSION = '1.0.0';
 
 =item my $principal = Authen::PAAS::BasicUser->new($username);
 
@@ -74,7 +73,7 @@ sub new {
 
 __END__
 
-=back 4
+=back
 
 =head1 AUTHORS
 
@@ -82,10 +81,10 @@ Daniel Berrange <dan@berrange.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2005 Daniel Berrange
+Copyright (C) 2004-2006 Daniel Berrange
 
 =head1 SEE ALSO
 
-L<perl(1)>, L<Authen::PAAS::BasicLoginModule>, L<Authen::PAAS::Principal>
+L<Authen::PAAS::BasicLoginModule>, L<Authen::PAAS::Principal>
 
 =cut

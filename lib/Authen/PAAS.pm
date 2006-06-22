@@ -1,6 +1,6 @@
 # -*- perl -*-
 #
-# Copyright (C) 2004-2005 Daniel Berrange
+# Copyright (C) 2004-2006 Daniel Berrange
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,13 +19,16 @@
 
 package Authen::PAAS;
 
+use strict;
+use warnings;
+
 use vars qw($VERSION);
 
-$VERSION = "1.1.0";
+$VERSION = "1.1.1";
 
 =pod
 
-=head1 NAME 
+=head1 NAME
 
 Authen::PAAS - Perl Authentication & Authorization Service
 
@@ -34,7 +37,7 @@ Authen::PAAS - Perl Authentication & Authorization Service
   use Authen::PAAS::Context
   use Authen::PAAS::SimpleCallback;
   use Config::Record;
-  
+
   my $config = Config::Record->new("/etc/myapp.cfg");
 
   my $context = Authen::PAAS::Context->new($config, "myapp");
@@ -57,35 +60,34 @@ Authen::PAAS - Perl Authentication & Authorization Service
 
 =head1 DESCRIPTION
 
-The C<Authen::PAAS> distribution provides a Perl API for authenticating 
-and authorizing users of computing services. Its design is inspired by 
+The C<Authen::PAAS> distribution provides a Perl API for authenticating
+and authorizing users of computing services. Its design is inspired by
 existing pluggable authentication services such as C<PAM> and Java's
 C<JAAS>, so people familiar with those two services should be comfortable
 with the concepts in C<Authen::PAAS>. At its heart, C<Authen::PAAS> provides
-a login service, with pluggable modules for performing different authentication 
-schemes. The pluggable framework enables the system  administrator, rather 
-than the application developer to define what method is used to authentication 
+a login service, with pluggable modules for performing different authentication
+schemes. The pluggable framework enables the system  administrator, rather
+than the application developer to define what method is used to authentication
 with a particular application.
 
-One might ask, why not just use PAM directly via the existing 
-L<Authen::PAM> Perl bindings. While this works well for applications 
-which wish to authenticate against real UNIX user accounts (eg FTP, 
-Telnet, SSH), it is not particularly well suited to applications 
-with 'virtualized' user accounts. For example, a web application may 
-maintain a set of virtual user accounts in a database, or a chat server, 
+One might ask, why not just use PAM directly via the existing
+L<Authen::PAM> Perl bindings. While this works well for applications
+which wish to authenticate against real UNIX user accounts (eg FTP,
+Telnet, SSH), it is not particularly well suited to applications
+with 'virtualized' user accounts. For example, a web application may
+maintain a set of virtual user accounts in a database, or a chat server,
 may maintain a set of user accounts in a text configuration file.
-Since it merely delegates through to the underlying C libraries, 
+Since it merely delegates through to the underlying C libraries,
 the L<Authen::PAM> module does not provide a convenient means to
-write new authentication schemes in Perl. Thus the C<Authen::PAAS> 
+write new authentication schemes in Perl. Thus the C<Authen::PAAS>
 distribution provides a pure Perl API for authentication.
 
 =head1 COPYRIGHT
 
-Copyright 2004-2005 Daniel Berrange <dan@berrange.com>
+Copyright 2004-2006 Daniel Berrange <dan@berrange.com>
 
 =head1 SEE ALSO
 
-L<Authen::PAAS::Context>, L<Authen::PAAS::Subject>, L<pam(8)>, L<Authen::PAM>
+L<Authen::PAAS::Context>, L<Authen::PAAS::Subject>, C<pam(8)>, L<Authen::PAM>
 
 =cut
-

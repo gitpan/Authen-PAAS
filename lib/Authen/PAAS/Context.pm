@@ -2,7 +2,7 @@
 #
 # Authen::PAAS::Context by Daniel Berrange
 #
-# Copyright (C) 2004 Dan Berrange
+# Copyright (C) 2004-2006 Dan Berrange
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ Authen::PAAS::Context - authentication a subject using login modules
   use Authen::PAAS::Context;
   use Authen::PAAS::SimpleCallback;
   use Config::Record;
-  
+
   my $config = Config::Record->new("/etc/myapp.cfg");
 
   my $context = Authen::PAAS::Context->new($config, "myapp");
@@ -56,15 +56,15 @@ Authen::PAAS::Context - authentication a subject using login modules
 The C<Authen::PAAS::Context> module provides the controller
 for invoking a number of login modules, and having them
 populate a subject with principals and credentials. The
-authentication process consists of two stages. In the first 
-phase the C<login> method is invoked on all modules to 
+authentication process consists of two stages. In the first
+phase the C<login> method is invoked on all modules to
 perform the actual authentication process. If a module's
 authentication process succeded, then it may wish to store
-state to represent the result of authentication in the 
+state to represent the result of authentication in the
 supplied instance of C<Authen::PAAS::State>. If the first
-phase was successful overall, then the C<commit> method will 
-be invoked on all modules. The module's C<commit> method will 
-check the stored state for the result of the first phase, and 
+phase was successful overall, then the C<commit> method will
+be invoked on all modules. The module's C<commit> method will
+check the stored state for the result of the first phase, and
 if it was successful, then it will add one or more principals
 and zero or more credentials to the subject. If there is a
 terminal failure of the authentication process at any point,
@@ -74,15 +74,15 @@ the abort() method will be invoked on all modules
 =head1 CONFIGURATION
 
 The L<Config::Record> module is used for accessing configuration
-file information. The configuration file defines the set of 
+file information. The configuration file defines the set of
 login modules used for performing authentication. The modules
 have associated flags controlling operation of the login process
 upon success/failure of a module. The configuration is stored in
-a single list, named C<auth.$APP> where $APP is the name token 
-passed into the constructor of the C<Authen::PAAS::Context> object. 
+a single list, named C<auth.$APP> where $APP is the name token
+passed into the constructor of the C<Authen::PAAS::Context> object.
 Each element in the list is a dictionary, with the key C<module>
-defining the class name of the login module, the key C<flags> 
-defining the login flags and C<options> defining any module 
+defining the class name of the login module, the key C<flags>
+defining the login flags and C<options> defining any module
 specific options. For example, a web application may have a
 a username/password in the main login page, but elsewhere use a
 cookie as the authentication data. In this case, a configuration
@@ -98,8 +98,8 @@ look like
       module = Authen::PAAS::CGI::CookieLogin
       flags = requisite
       options = {
-        secret = /etc/authen-paas/authen-paas-cgi-secret.dat
-        user-module = Authen::PAAS::DB::User
+	secret = /etc/authen-paas/authen-paas-cgi-secret.dat
+	user-module = Authen::PAAS::DB::User
       }
     }
   )
@@ -114,13 +114,13 @@ look like
 package Authen::PAAS::Context;
 
 use strict;
-use Carp qw(confess);
+use warnings;
+
 use Authen::PAAS::Subject;
 use Log::Log4perl;
 
 our $VERSION = '1.0.0';
 
-=pod
 
 =item $obj = Authen::PAAS::Context->new();
 
@@ -134,8 +134,8 @@ sub new {
     my $self = {};
     my %params = @_;
 
-    $self->{config} = exists $params{config} ? $params{config} : confess "config parameter is required";
-    $self->{name} = exists $params{name} ? $params{name} : confess "name parameter is required";
+    $self->{config} = exists $params{config} ? $params{config} : die "config parameter is required";
+    $self->{name} = exists $params{name} ? $params{name} : die "name parameter is required";
     $self->{modules} = [];
 
     bless $self, $class;
@@ -163,12 +163,24 @@ sub _load {
 	$logger->debug("Loading module $pack with " . $module->{flags});
 	my $object = $pack->new(flags => $module->{flags},
 				options => $module->{options});
-	
+
 	push @modules, $object;
     }
-    
+
     $self->{modules} = \@modules;
 }
+
+=item my $subject = $ctx->login(\%callbacks);
+
+Attempt to authenticate the user, using data obtained from the
+callbacks passed in as the first parameter. The callbacks should
+be a hash reference, where keys are the callback name, and the
+values are instances of the C<Authen::PAAS::Callback> module.
+If authentication succeeded, an instance of the C<Authen::PAAS::Subject>
+module will be returned, otherwise an undefined value will be
+returned.
+
+=cut
 
 sub login {
     my $self = shift;
@@ -176,11 +188,11 @@ sub login {
 
     my $logger = Log::Log4perl->get_logger(ref($self));
     my $subject = Authen::PAAS::Subject->new();
-    
+
     my $success;
     foreach my $module (@{$self->{modules}}) {
 	if ($module->flags eq "sufficient") {
-	    if ($module->login($subject, $callbacks)) { 
+	    if ($module->login($subject, $callbacks)) {
 		$logger->info("Sufficient login $module success");
 		if (!defined $success) {
 		    $success = 1;
@@ -191,7 +203,7 @@ sub login {
 		# continue
 	    }
 	} elsif ($module->flags eq "requisite") {
-	    if ($module->login($subject, $callbacks)) { 
+	    if ($module->login($subject, $callbacks)) {
 		$logger->info("Requisite login $module success");
 		if (!defined $success) {
 		    $success = 1;
@@ -199,10 +211,10 @@ sub login {
 	    } else {
 		$logger->info("Requisite login $module fail");
 		$success = 0;
-		last;		
+		last;
 	    }
 	} elsif ($module->flags eq "required") {
-	    if ($module->login($subject, $callbacks)) { 
+	    if ($module->login($subject, $callbacks)) {
 		$logger->info("Required login $module success");
 		$success = 1;
 	    } else {
@@ -211,7 +223,7 @@ sub login {
 		# continue
 	    }
 	} elsif ($module->flags eq "optional") {
-	    if ($module->login($subject, $callbacks)) { 
+	    if ($module->login($subject, $callbacks)) {
 		$logger->info("Optional login $module success");
 		if (!defined $success) {
 		    $success = 1;
@@ -222,17 +234,26 @@ sub login {
 	    }
 	}
     }
-    
+
     return $success ? $subject : undef;
 }
 
+
+=item $ctx->logout($subject)
+
+Takes an authenticated subject and performs a logout
+operation. This method would typically destroy any
+tokens / credentials that might exist beyond the lifetime
+of the current process.
+
+=cut
 
 sub logout {
     my $self = shift;
     my $subject = shift;
 
     my $logger = Log::Log4perl->get_logger(ref($self));
-    
+
     foreach my $module (@{$self->{modules}}) {
 	$logger->info("Logging out $module");
 	$module->logout($subject);
@@ -244,7 +265,7 @@ sub logout {
 
 __END__
 
-=back 4
+=back
 
 =head1 AUTHORS
 
@@ -252,10 +273,10 @@ Daniel Berrange <dan@berrange.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004 Daniel Berrange
+Copyright (C) 2004-2006 Daniel Berrange
 
 =head1 SEE ALSO
 
-L<perl(1)>
+L<Authen::PAAS>, L<Authen::PAAS::LoginModule>, L<Authen::PAAS::Subject>
 
 =cut

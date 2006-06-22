@@ -8,7 +8,7 @@ set -e
 # Print command executed to stdout
 set -v
 
-AUTOBUILD_PERL5LIB=`perl -e 'use Config; my $dir = $Config{sitelib}; $dir =~ s|/usr|$ENV{AUTO_BUILD_ROOT}|; print $dir'`
+AUTOBUILD_PERL5LIB=`perl -e 'use Config; my $dir = $Config{sitelib}; $dir =~ s|$Config{siteprefix}|$ENV{AUTOBUILD_INSTALL_ROOT}|; print $dir'`
 if [ -z "$PERL5LIB" ]; then
   export PERL5LIB=$AUTOBUILD_PERL5LIB
 else
@@ -22,7 +22,7 @@ rm -rf MANIFEST blib
 
 # Make makefiles.
 
-perl Makefile.PL PREFIX=$AUTO_BUILD_ROOT
+perl Makefile.PL PREFIX=$AUTOBUILD_INSTALL_ROOT
 make manifest
 echo $NAME.spec >> MANIFEST
 
@@ -44,7 +44,7 @@ fi
 
 
 
-make INSTALLMAN3DIR=$AUTO_BUILD_ROOT/share/man/man3 install
+make INSTALLMAN3DIR=$AUTOBUILD_INSTALL_ROOT/share/man/man3 install
 
 rm -f $NAME-*.tar.gz
 make dist

@@ -8,6 +8,8 @@ WriteMakefile(
 	      VERSION_FROM => 'lib/Authen/PAAS.pm',
 	      PREREQ_PM => {
 		  "Config::Record" => "1.1.0",
+                  "IO::Handle" => 0,
+                  "Log::Log4perl" => 0, 
 	      },
 	      dist =>
 	      {
@@ -18,17 +20,18 @@ WriteMakefile(
 	      {
 	       FILES => '*.bak *~',
 	      },
-	      
+
 	      depend => {
-	        Makefile => '$(VERSION_FROM)',
+		Makefile => '$(VERSION_FROM)',
+                Authen-PAAS.spec => "Authen-PAAS.spec.PL"
 	      },
-	      
+
 	      realclean => {
 	       FILES => 'Authen-PAAS-*.tar.gz',
 	      },
-              EXE_FILES => [
-                "bin/authen-paas-passwd.pl"
-              ],
+	      EXE_FILES => [
+		"bin/authen-paas-passwd"
+	      ],
 	     );
 
 package MY;
@@ -61,17 +64,18 @@ $(HTMLDIR)/%.html: lib/%.pm
 sub test {
     my $self = shift;
     my $mm_test = $self->SUPER::test(@_);
-    
+
     return '
-TO_TEST_PM = $(TO_INST_PM:lib/%.pm=blib/test/%.pm)
+TO_TEST_PM = $(TO_INST_PM:lib/%.pm=blib/test/%.pm.tstamp)
 
 test :: test-syntax
 
 test-syntax: pure_all $(TO_TEST_PM)
 
-blib/test/%.pm: lib/%.pm
+blib/test/%.pm.tstamp: lib/%.pm
 	@echo -n "Checking $<: "
 	@perl -I blib/lib -c $<
+	@podchecker $<
 	@mkdir -p `dirname $@`
 	@touch $@
 

@@ -2,7 +2,7 @@
 #
 # Authen::PAAS::Callback by Daniel Berrange
 #
-# Copyright (C) 2004-2005 Dan Berrange
+# Copyright (C) 2004-2006 Dan Berrange
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ Authen::PAAS::Callback - callback for retrieving authentication data
 =head1 DESCRIPTION
 
 This module provides an mechanism for login modules to retrieve
-authentication data from an external party, without having to 
+authentication data from an external party, without having to
 know the means of communication between the application and the
 user. So, a login module can merely lookup the callback associated
 with the key C<username>, and ask it for data, regardless of whether
@@ -51,13 +51,10 @@ box, or fetches it from the HTTP headers.
 
 package Authen::PAAS::Callback;
 
-#use base qw();
 use strict;
-use Carp qw(confess);
+use warnings;
 
 our $VERSION = '1.0.0';
-
-=pod
 
 =item my $callback = Authen::PAAS::Callback->new();
 
@@ -78,26 +75,24 @@ sub new {
 }
 
 
-=pod
-
 =item my $data = $callback->data;
 
-Retrieves the data from this callback. This method must be 
+Retrieves the data from this callback. This method must be
 implemented by the subclass, and it is entirely upto the
-subclass how the data is collected from the user. 
+subclass how the data is collected from the user.
 
 =cut
 
 sub data {
     my $self = shift;
-    confess "object " . ref($self) . " forgot to implement the data method";
+    die "object " . ref($self) . " forgot to implement the data method";
 }
 
 1 # So that the require or use succeeds.
 
 __END__
 
-=back 4
+=back
 
 =head1 AUTHORS
 
@@ -105,10 +100,10 @@ Daniel Berrange <dan@berrange.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2005 Daniel Berrange
+Copyright (C) 2004-2006 Daniel Berrange
 
 =head1 SEE ALSO
 
-L<perl(1)>, L<Authen::PAAS::Context>, L<Authen::PAAS::LoginModule>
+L<Authen::PAAS::Context>, L<Authen::PAAS::LoginModule>
 
 =cut

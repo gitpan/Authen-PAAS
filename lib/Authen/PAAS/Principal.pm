@@ -2,7 +2,7 @@
 #
 # Authen::PAAS::Principal by Daniel Berrange
 #
-# Copyright (C) 2004 Dan Berrange
+# Copyright (C) 2004-2006 Dan Berrange
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,15 +24,24 @@
 
 =head1 NAME
 
-Authen::PAAS::Principal - blah
+Authen::PAAS::Principal - An identity for a subject
 
 =head1 SYNOPSIS
 
   use Authen::PAAS::Principal;
 
+  my $princ = Authen::PAAS::Principal->new(name => $name);
+
+  print $princ->name, "\n";
+
 =head1 DESCRIPTION
 
-Blah
+This module represents an identity for a subject. An identity
+may be a kerberos principal, a UNIX username, or any other
+identifying token related to a particular authentication
+scheme. This module will usually be sub-classed by each
+C<Authen::PAAS::LoginModule> implementation to provide module
+specific identifying data.
 
 =head1 METHODS
 
@@ -44,15 +53,14 @@ package Authen::PAAS::Principal;
 
 use warnings;
 use strict;
-use Carp qw(confess);
 
 our $VERSION = '1.0.0';
 
-=pod
+=item $obj = Authen::PAAS::Principal->new(name => $name);
 
-=item $obj = Authen::PAAS::Principal->new();
-
-Create
+Create a new principal with a name given by the C<name>
+parameter. This constructor will typically only be used
+by sub-classes of this module.
 
 =cut
 
@@ -62,13 +70,20 @@ sub new {
     my $self = {};
     my %params = @_;
 
-    $self->{name} = exists $params{name} ? $params{name} : confess "name parameter is required";
+    $self->{name} = exists $params{name} ? $params{name} : die "name parameter is required";
 
     bless $self, $class;
 
     return $self;
 }
 
+
+=item my $name = $princ->name;
+
+Retrieves the name associated with this principal, as set
+in the constructor.
+
+=cut
 
 sub name {
     my $self = shift;
@@ -80,7 +95,7 @@ sub name {
 
 __END__
 
-=back 4
+=back
 
 =head1 AUTHORS
 
@@ -88,10 +103,10 @@ Daniel Berrange <dan@berrange.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004 Daniel Berrange
+Copyright (C) 2004-2006 Daniel Berrange
 
 =head1 SEE ALSO
 
-L<perl(1)>
+L<Authen::PAAS::Subject>, L<Authen::PAAS::Credential>
 
 =cut

@@ -14,5 +14,6 @@ CVS/
 ^test.log$
 (^|/)#.*#
 ^pod2htm.*
+^.hg
 00-TEMPLATE
 Makefile.old
